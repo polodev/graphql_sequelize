@@ -46,8 +46,13 @@ Conn.sync({
             firstName : Faker.name.firstName(),
             lastName : Faker.name.lastName(),
             email : Faker.internet.email()
-        })
-    })
-})
+        }).then((person) => {
+            return person.createPost ({
+                title : `Sample post create by ${person.firstName}`,
+                content : 'This is a sample article'
+            })
+        });
+    });
+});
 
 export default Conn;
