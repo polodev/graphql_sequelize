@@ -3,6 +3,7 @@ import {
     GraphQLList,
     GraphQLObjectType,
     GraphQLSchema,
+    GraphQLNonNull,
     GraphQLString,
 } from 'graphql';
 import Db from './db.js';
@@ -78,6 +79,43 @@ const Post = new GraphQLObjectType({
     })
 })
 
+const Mutation = new GraphQLObjectType({
+    name : 'Mutation',
+    description : "Functions to create stuff",
+    fields : () => {
+        return {
+            addPerson : {
+                type : Person,
+                args : {
+                    firstName : {type : new GraphQLNonNull(GraphQLString) },
+                    lastName : {type : new GraphQLNonNull(GraphQLString)},
+                    email : {type : new GraphQLNonNull(GraphQLString)}
+                },
+                resolve(_, args) {
+                    return Db.models.person.create({
+                        firstName : args.firstName,
+                        lastName : args.lastName,
+                        email : args.email.toLowerCase()
+                    });
+                }
+            },
+            addPost : {
+                type : Post,
+                args : {
+                    title : {type : new GraphQLNonNull(GraphQLString) },
+                    content : {type : new GraphQLNonNull(GraphQLString) },
+                },
+                resolve(_, args) {
+                    return Db.models.post.create({
+                        title : args.title,
+                        content : args.content
+                    })
+                }
+            }
+        }
+    }
+})
+
 const Query = new GraphQLObjectType({
     name : 'Query',
     description : 'This is the root query',
@@ -114,7 +152,8 @@ const Query = new GraphQLObjectType({
 })
 
 const Schema = new GraphQLSchema ({
-    query : Query
+    query : Query,
+    mutation : Mutation
 })
 
 export default Schema;
